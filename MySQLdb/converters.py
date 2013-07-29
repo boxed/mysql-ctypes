@@ -10,6 +10,7 @@ def literal(value):
 
 def unicode_to_quoted_sql(connection, obj):
     return connection.string_literal(obj.encode(connection.character_set_name()))
+Thing2Literal = unicode_to_quoted_sql # django compatibility
 
 def object_to_quoted_sql(connection, obj):
     if hasattr(obj, "__unicode__"):
