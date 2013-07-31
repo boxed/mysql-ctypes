@@ -29,6 +29,9 @@ def datetime_encoder(connection, obj):
 def set_encoder(connection, obj):
     return connection.string_literal(','.join(obj))
 
+def list_encoder(connection, obj):
+    return ','.join([object_to_quoted_sql(connection, x) for x in obj])
+
 _simple_field_encoders = {
     type(None): lambda connection, obj: "NULL",
     int: literal_encoder,
@@ -37,6 +40,8 @@ _simple_field_encoders = {
     str: object_to_quoted_sql,
     datetime: datetime_encoder,
     set: set_encoder,
+    list: list_encoder,
+    tuple: list_encoder,
 }
 
 def simple_encoder(obj):

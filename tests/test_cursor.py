@@ -233,6 +233,21 @@ class TestCursor(BaseMySQLTests):
                 assert isinstance(v, unicode)
                 assert v == unicodedata
 
+    def test_in_statement(self, connection):
+        with self.create_table(connection, "things", uid="INT"):
+            with contextlib.closing(connection.cursor()) as cursor:
+                r = cursor.executemany("INSERT INTO things (uid) VALUES (%s)", [(1,), (2,)])
+                assert r == 2
+                cursor.execute("SELECT * FROM things WHERE uid IN (%s)", ([1, 2],))
+                assert cursor.fetchall() == [(1,), (2,)]
+
+        with self.create_table(connection, "things", uid="varchar(50)"):
+            with contextlib.closing(connection.cursor()) as cursor:
+                r = cursor.executemany("INSERT INTO things (uid) VALUES (%s)", [('1',), ('2',)])
+                assert r == 2
+                cursor.execute("SELECT * FROM things WHERE uid IN (%s)", (['1', '2'],))
+                assert cursor.fetchall() == [('1',), ('2',)]
+
 
 class TestDictCursor(BaseMySQLTests):
     def test_fetchall(self, connection):
